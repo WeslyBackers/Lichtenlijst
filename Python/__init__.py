@@ -1,6 +1,12 @@
 import sys
+import shapefile
 
-x = 6
-y = 7
+sf = shapefile.Reader("F:\Werk\Lichtenlijst\Data\BEL_water_lines_dcw.shp")
 
-print(x+y)
+records=sf.records()
+fields=sf.fields
+types = sf.shapeType
+
+print(fields)
+print(types)
+print(records)
