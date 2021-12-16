@@ -1,0 +1,201 @@
+    thead {
+        border-color: rgb(0, 0, 0);
+        background-color: rgb(223, 219, 210);
+    }
+    
+    thead td {
+        border-color: rgb(0, 0, 0);
+        background-color: rgb(223, 219, 210);
+        font-size: 18px;
+        font-weight: bold;
+        padding: 5px;
+        text-align: center;
+    }
+    
+    .lltable>thead {
+        border-color: rgb(0, 0, 0);
+        background-color: rgb(255, 255, 255);
+    }
+    
+    .navbar-logo {
+        mix-blend-mode: multiply;
+        filter: brightness(1);
+    }
+    
+    .logo {
+        width: 50%;
+        height: 75%;
+    }
+    
+    hr {
+        border-color: gray;
+    }
+    
+    .choosefile {
+        padding: 3px;
+        background-color: rgb(201, 168, 168);
+    }
+    
+    .table-correcties-tr {
+        height: 7vh;
+        width: 120vw;
+        background-color: white;
+        border-color: black;
+    }
+    
+    .lltable>tbody>tr:nth-child(even) {
+        background-color: rgb(230, 216, 216) !important;
+    }
+    
+    .div--title-titles>h2 {
+        text-align: center;
+        color: chocolate;
+    }
+    
+    .div--title-titles>h3 {
+        text-align: center;
+        color: chocolate;
+    }
+    
+    .subtitle {
+        background-color: white;
+        font-weight: 700;
+        font-size: 24px;
+    }
+    
+    .tbody td {
+        height: 16px;
+        font-size: 14px;
+        padding: 2px;
+    }
+    
+    .tbody-geodracht td:first-child {
+        width: 150px;
+        text-align: center;
+    }
+    
+    .td2 {
+        text-align: left;
+    }
+    
+    .td7 {
+        text-align: left;
+    }
+    
+    .td8 {
+        text-align: left;
+    }
+    
+    .p01 {
+        text-align: center;
+    }
+    
+    .navbar>hr {
+        color: black;
+    }
+    
+    .div--infodate>h3 {
+        color: chocolate;
+    }
+    
+    h3,
+    h4 {
+        color: rgb(40, 89, 196);
+    }
+    
+    ul {
+        list-style-type: initial;
+    }
+    
+    .table-correcties {
+        width: 100vw;
+        table-layout: auto;
+    }
+    
+    .head--rows>tr>.th1 {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 570px;
+    }
+    
+    .div--map {
+        position: relative;
+        height: 500px;
+        width: 100%;
+        top: 0cm;
+    }
+    
+    .map-comment {
+        position: absolute;
+        top: 0px;
+        left: 50px;
+    }
+    
+    .div--voorwoord {
+        height: 100%;
+        page-break-before: always;
+    }
+    
+    .div--lichtenlijst-titles {
+        height: 100%;
+        page-break-before: always;
+    }
+    
+    .div--title {
+        height: 100%;
+    }
+    
+    .div--title-titles {
+        height: 100%;
+    }
+    
+    .new-page {
+        page-break-before: always;
+    }
+    
+    .new-page-no-card {
+        page-break-before: always;
+    }
+    
+    header {
+        display: block;
+    }
+    
+    .tbody-litchr tr {
+        padding: 2px;
+    }
+    
+    .tbody-litchr tr td:first-child+td {
+        text-align: center;
+    }
+    
+    .tbody-litchr tr td:first-child+td+td {
+        text-align: center;
+    }
+    
+    .tbody-litchr tr td:first-child+td+td+td {
+        text-align: center;
+    }
+    
+    .img-litchr {
+        width: 200px;
+        padding: 5px;
+        align-items: center;
+    }
+    
+    .col5 {
+        column-count: 5;
+    }
+    
+    #table--head-ll .th1 {
+        position: sticky;
+        top: -1px;
+        background-color: white;
+    }
+    
+    #table--head-ll .th1 {
+        position: sticky;
+        top: 50px;
+        background-color: white;
+        width: auto;
+    }

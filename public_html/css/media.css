@@ -1,0 +1,35 @@
+@media print {
+    @page {
+        size: A4 portrait !important;
+    }
+    body {
+        -webkit-print-color-adjust: exact !important;
+    }
+    #content {
+        display: table;
+    }
+    #pageFooter {
+        display: table-footer-group;
+    }
+    .btn-group {
+        display: none;
+    }
+    nav {
+        display: none;
+    }
+    .search {
+        display: none;
+    }
+    .div--title-titles {
+        margin-top: 50%;
+    }
+    thead tr td {
+        background-color: rgb(223, 219, 210) !important;
+    }
+    .lltable tbody tr:nth-child(even)>td {
+        background-color: rgb(230, 216, 216) !important;
+    }
+    .table--head {
+        top: fixed;
+    }
+}

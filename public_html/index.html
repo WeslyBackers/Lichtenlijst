@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--                            Use of: 
+                                                Bootstrap 4.3.1 
+                                                JQuery 3.4.1
+                                                Font-Awesome
+        -->
+    <script src="js/filereader.js" type="text/javascript"></script>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lichtenlijst</title>
+    <link rel="stylesheet" href="./bootstrap-4.3.1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/media.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+</head>
+
+<body class="body">
+
+    <!--Lichtenlijst Web Application-->
+
+    <div class="d-flex flex-column div--allcontent">
+
+        <!--                        Navigation                              -->
+        <div class="sticky-top div--allmenus bg-dark no-print" role="group" aria-label="Button group">
+            <!-- Logo & sitetitle-->
+
+            <nav class='navbar-dark bg-dark fixed-top'>
+
+                <div class="navbar-buttons w-100 d-flex align-content-end ">
+                    <div class="m-2"><button class="btn
+                                                 btn-primary d-inline-block
+                                                 btn--getfileGML" type="button" data-toggle="tooltip" data-placement="bottom" title="Lokaal GML-bestand (CARIS GML)">*.GML <i class="fas fa-file-import"></i></button></div>
+
+                    <div class="m-2"><button class="btn
+                                                 btn-primary d-inline-block
+                                                 btn--getfileJSON" type="button" data-toggle="tooltip" data-placement="bottom" title="Lokaal GeoJSON-bestand (GEOJSON)">*.JSON <i class="fas fa-file-import"></i></button></div>
+                    <div class="m-2"><button class="btn
+                                                 btn-secondary d-inline-block
+                                                 btn--list" type="button" disabled><i class="fas fa-database" title="Open Data uit database"></i></button></div>
+                    <div class="m-2"><button class="btn btn-secondary
+                                                 d-inline-block btn--openSearch" type="button" title="Zoek in specifiek kolom"><i class="fas fa-search"></i></button></div>
+                    <div class="m-2"><button class="btn btn-secondary
+                                                 d-inline-block
+                                                 btn-map" type="button" title="Open interactieve map"><i class="fas fa-map-marked-alt" onclick="mapLights()"></i></button></div>
+                    <div class="m-2"><button class="btn btn-secondary
+                                                 d-inline-block
+                                                 btn-print" type="button" data-toggle="tooltip" data-placement="bottom" title="print"><i class="fas fa-print"></i></button></div>
+                    <div class="m-2"><button class="btn btn-secondary
+                                                 d-inline-block
+                                                 btn--expand" type="button" title="maximaliseer het scherm" disabled><i class="fas fa-expand"></i></button></div>
+                    <div class="m-2"><button class="btn btn-info ml-5
+                                                 d-inline-block
+                                                 btn--info" type="button" title="Informatie betreffende de lichtenlijst"><i class="fas fa-info"></i></button></div>
+                    <div class="m-2"><a href="workflow.html" target="_blank"><button class="btn btn-info ml-5
+                                                 d-inline-block
+                                                 btn--info" type="button" title="Workflow"><i class="fas fa-cogs"></i></button></a></div>
+
+                </div>
+
+                <!-- input menus  -->
+                <div class='bg-secondary div--searchfiles'>
+                    <div class='choosefileJSON'>
+                        <input class='inputchoosefile' type='file' accept='text/plain, *.JSON' onchange='openFileJSON(event)'><br>
+                    </div>
+                    <div class='choosefileGML'>
+                        <input class='inputchoosefile' type='file' accept='text/plain, *.GML' onchange='openFileGML(event)'><br>
+                    </div>
+                    <!-- search bar start  -->
+                    <div id="div--search" class='input-group input--search  justify-content-center'>
+                        <input id='inputSearch' type='text' placeholder='search here' class="form-control m-2 input--searchField w-30" placeholder="" aria-label="" aria-describedby="basic-addon1" onInput="filterTable()">
+                        <div class='input--select p-2 w-30 d-flex'>
+                            <select id='input-selectcol' class="custom-select" oninput="filterTable()">
+                                <option selected>Selecteer kolom</option>
+                                <option value="1">VOLGNR</option>
+                                <option value="2">PLAATS-NAAM</option>
+                                <option value="3">POSITIE GEO</option>
+                                <option value="4">LICHT- EN MISTSEIN</option>
+                                <option value="5">HOOGTE</option>
+                                <option value="6">DRACHT</option>
+                                <option value="7">BESCHRIJVING</option>
+                                <option value="8">VERDERE GEGEVENS</option>
+                        </select>
+                        </div>
+                        <div class='input--select w-30 p-2 d-flex'>
+                            <select id='input-selectchart' class="custom-select-chart" oninput="filterTable()">
+                                <option selected>Selecteer Kaart</option>
+                                <option value="1">D11</option>
+                                <option value="2">101</option>
+                                <option value="3">102</option>
+                                <option value="4">103</option>
+                                <option value="5">104</option>
+                                <option value="6">105</option>
+                                <option value="7">106</option>
+                                <option value="8">107</option>
+                                <option value="8">BNZ</option>
+                             </select>
+                        </div>
+                        <div class="input-group-append d-flex">
+                            <button class="btn btn-primary btn--search" type="button">Zoek</button>
+                        </div>
+                        <div class="input-group-append d-flex">
+                            <button class="btn btn-secondary btn--clear" type="button">Herstel</button>
+                        </div>
+
+                    </div>
+                    <div class="div--voorwoord-nav">
+                        <nav class="navbar-inhoud navbar navbar-expand-sm navbar-light">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Voorwoord">Voorwoord</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Kaartindex">Kaartindex</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Lijstderafk">Lijst der afkortingen</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link" href="#Inleiding">Inleiding</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Verkeersseinen">Verkeersseinen</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Tabel_geo_dracht">Tabel geografische dracht</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Diagram">Diagram en toelichting</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#Lichtenlijst">Gegevens van de lichten</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div id="fileInfo" class='div--fileInfo bg-light p-1'>
+                        <p>Nog geen data ingelezen!</p>
+                    </div>
+                </div>
+                <div class="div--map sticky align-items-center" id="mapid">
+                    <div class='map-comment bg-warning d-flex'>!! Not for navigation, only in information mode !!</div>
+                </div>
+            </nav>
+
+        </div>
+        <!-- search bar end -->
+        <!-- <div class='header'>test</div> -->
+        <div id="content" class="div--lichtenlijst print">
+            <!--ALERT TO USERS-->
+            <!--div class="div--alert-to-users alert alert warning text-center p-2">
+                <p>DE LICHTENLIJST WORDT NIET MEER IN BOEKVORM GEPUBLICEERD MAAR IS ENKEL NOG OP DEZE WEBSITE TE RAADPLEGEN EN TE DOWNLOADEN </p>
+            </div-->
+
+
+            <!--start Introduction-->
+
+            <div class="div--introduction m-3">
+                <!--title-->
+                <div class="div--title h-100 align-items-center">
+                    <div class="div--title-titles card p-2">
+                        <h2 class="title-headtitle">LICHTENLIJST</h2>
+                        <h3 class="title-subtitle ">Lichten en mistseinen van België en aangrenzend gebied</h3>
+                        <div class="div--infodate title-infodate w-100 text-center">
+                            <h3>Bijgewerkt tot </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Index-->
+                <div id="Index" class="div--index card p-5 mt-5 container-fluid new-page">
+                    <div class="div-index-title">
+                        <h3>INHOUD</h3>
+                    </div>
+                    <div>
+                        <p>Hier komt de index</p>
+                    </div>
+                </div>
+
+                <!--Voorwoord-->
+                <div id="Voorwoord" class="div--voorwoord card p-5 mt-5 container-fluid new-page" style="margin-top: 4cm;">
+                    <div class="div-voorwoord-title">
+                        <h3>I. VOORWOORD</h3>
+                        <hr>
+                        <br>
+                    </div>
+                    <div>
+                        <ol>
+                            <li>De lichtenlijst geeft een opsomming en beschrijving van de lichten en mistseinen gelegen in:
+                                <ul>
+                                    <li>Het zeegebied begrensd door de meridianen 02°05’00”E en 03°35’00”E, de kust en de breedtegraad 51°41’00”N</li>
+                                    <li>Het riviergebied van de Schelde, van Vlissingen tot aan de Rupel</li>
+                                    <li>Het kanaal Gent-Terneuzen</li>
+                                </ul>
+                            </li>
+                            <br>
+                            <li>
+                                Bronvermelding
+                                <ul>
+                                    <li> Gegevens van de Afdeling Kust - Vlaamse Hydrografie</li>
+                                    <li> Gegevens van de Afdeling Maritieme Toegang</li>
+                                    <li> Gegevens van de Dienst der Hydrografie (Nederland)</li>
+                                    <li> Gegevens van de “Service Hydrographique et Océanographique de la Marine” (Frankrijk)</li>
+                                    <!--verwijderd: <li> Instructies IHO i.v.m. opmaken lichtenlijsten</li> -->
+                                </ul>
+                            </li>
+                            <br>
+                            <li>
+                                Waar graden worden aangegeven gebeurt dit zonder vermelding van het graadteken bij lichtsectoren; alleenstaande cijferwaarden krijgen wel een graadindicatie.
+                            </li>
+                            <br>
+                            <li>
+                                Bijwerken van de lichtenlijst
+                                <ul>
+                                    <li> Op de correctielijst is aangegeven t.e.m. welke Berichten aan Zeevarenden (BaZ) de informatie bij
+                                        <!--origineel aangepast: "bij aankoop"-->gedownloade versie is bijgewerkt</li>
+                                    <br>
+                                    <li>Correcties en/of aanvullingen
+                                        <!--vewijderd "hierop"-->worden gepubliceerd in de BaZ</li>
+                                    <br>
+                                    <!--li>Bij aanschaf van een nieuw boekwerk worden de hierop van toepassing zijnde correcties en/of
+                                    aanvullingen verstrekt onder de vorm van een bijgevoegde lijst</li>
+                                    <br-->
+                                    <li> Op de correctielijst kan de gebruiker aangeven t.e.m. welke BaZ
+                                        <!--verwijderd: "hij dit boekwerk zelf"-->de download of afdruk zelf heeft bijgehouden.
+                                    </li>
+                                </ul>
+                            </li>
+                            <br>
+                            <p>
+                                Om
+                                <!--verwijderd "dit boekwerk"-->een gedownloade versie op de juiste wijze bij te houden is het dus noodzakelijk dat men beschikt over de Berichten aan Zeevarenden.</p><br>
+
+                            <!--aangepast:  p>U wordt uitgenodigd, alle opmerkingen die de scheepvaart aanbelangen en de gebieden van de
+                            Belgische kaarten “Vlaamse Banken” en “Westerschelde” betreffen, zo spoedig mogelijk over te maken
+                            aan het:</p-->
+                            <p>U wordt uitgenodigd, alle opmerkingen die de scheepvaart aanbelangen in de gebieden van de Belgische kaarten omvatten (zie III.Kaartindex), zo spoedig mogelijk over te maken aan het:</p>
+                            <p>Vlaams Ministerie van Mobiliteit en Openbare Werken<br> Agentschap voor Maritieme Dienstverlening en Kust<br> Afdeling Kust - Vlaamse Hydrografie<br> Administratief Centrum</p><br>
+                            <p>Vrijhavenstraat 3<br> 8400 Oostende<br> Tel. 059 55 42 11<br> email: nautinfo@mow.vlaanderen.be
+                            </p>
+                            <br>
+                            <p>Op ditzelfde adres kunnen tevens de eventuele onjuistheden of leemten worden gesignaleerd die vastgesteld worden in de publicaties van de Vlaamse Hydrografie.</p>
+                            <br>
+                            <br>
+                            <div class="div-voorwoord-signature">
+                                Directeur Vlaamse Hydrografie
+                            </div>
+                            <div class="div-voorwoord-signature">
+                                Koen Vanstaen
+                            </div>
+                        </ol>
+                    </div>
+                </div>
+                <!--Correctielijst-->
+                <div class="div--correcties card p-5 mt-5 container-fluid new-page">
+                    <div class="div-correcties-title">
+                        <h3>II. CORRECTIELIJST</h3>
+                        <hr>
+                        <br>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <table class="table-bordered table-correcties">
+                            <thead class="table-correcties--head">
+                                <!--                        Table Header Correctielijst                            -->
+                                <tr class="table-bordered">
+                                    <th class=" text-center">Nr. en jaar BaZ</th>
+                                    <th class=" text-center">Datum van corrigeren"</th>
+                                    <th class=" text-center">Nr. en jaar BaZ</th>
+                                    <th class=" text-center">Datum van corrigeren</th>
+                                </tr>
+                                <tbody class="table-correcties--body table-bordered">
+                                    <tr class="table-correcties-tr">
+                                        <td class="td-corr-baz"></td>
+                                        <td class="td-corr-date"></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-correcties-tr">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+
+                <!--Kaartindex-->
+                <div id="Kaartindex" class="div--kaartindex card p-5 mt-2 container-fluid new-page" style="scroll-margin-top:200px">
+                    <div class="div-kaartindex-title">
+                        <h3>III. KAARTINDEX</h3>
+                        <hr>
+                        <br>
+                    </div>
+                    <div class="div-kaartindex-content align-items-center">
+                        <p>De exacte ligging van de verschillende (deel)kaarten wordt weergegeven op de kaartjes A en B op volgende pagina’s.</p>
+                        <br>
+                        <div class="d-flex w-100 justify-content-center">
+                            <table class="table-kaartindexjustify-content-center">
+                                <thead class="table-kaartindex--head">
+                                    <!--                        Table header kaartindex                          -->
+                                    <tr class="table-bordered h-100">
+                                        <th class=" text-center">Nationaal nummer</th>
+                                        <th class=" text-center">Internationaal nummer</th>
+                                        <th class=" text-center">Titel van de kaart"</th>
+                                        <th class=" text-center">schaal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-correcties--body table-bordered">
+                                    <tr class="table-kaartindex-tr text-center h-10">
+                                        <td>D11</td>
+                                        <td></td>
+                                        <td class="text-left">Noordzee: Vlaamse Banken<br>Van Gravelines tot Oostkapelle</td>
+                                        <td>1/100 000</td>
+                                    </tr>
+                                    <tr class="table-kaartindex-tr text-center">
+                                        <td>101</td>
+                                        <td>INT 1474</td>
+                                        <td class="text-left">Noordzee: Belgisch-Nederlandse kust<br>Van Oostende tot Westkapelle</td>
+                                        <td>1/60 000</td>
+                                    </tr>
+                                    <tr class="table-kaartindex-tr text-center">
+                                        <td>102</td>
+                                        <td>INT 1480</td>
+                                        <td class="text-left">Noordzee: Frans-Belgische kust<br>Van Duinkerke tot Oostende</td>
+                                        <td>1/60 000</td>
+                                    </tr>
+                                    <tr class="table-kaartindex-tr text-center">
+                                        <td>104</td>
+                                        <td></td>
+                                        <td class="text-left">Westerschelde - Zeeschelde<br>Monding Westerschelde tot monding-Rupel<br>(omvat 10 kaartbladen)</td>
+                                        <td>1/15 000<br>1/50 000</td>
+                                    </tr>
+                                    <tr class="table-kaartindex-tr text-center">
+                                        <td>105</td>
+                                        <td></td>
+                                        <td class="text-left">Kanaal Gent naar Terneuzen<br>(omvat 10 kaartbladen)</td>
+                                        <td>1/10 000</td>
+                                    </tr>
+                                    <tr class="table-kaartindex-tr text-center">
+                                        <td>106</td>
+                                        <td>INT 1478</td>
+                                        <td class="text-left">Westerschelde - Zeeschelde<br>Baalhoek tot Wintam</td>
+                                        <td>van 1/10 000<br>1/30 000</td>
+                                    </tr>
+                                    <tr class="table-kaartindex-tr text-center">
+                                        <td>107</td>
+                                        <td></td>
+                                        <td class="text-left"></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <br>
+                        <div class="div-overzichtzk new-page-no-card">
+                            <h4>KAART A: Overzicht van de beschikbare papieren zeekaarten</h4>
+                            <div class="div-overzichtzk-img w-100">
+                                <img class="w-50 imgzk" src="./img/charts/P1 - Zeekaarten.jpg">
+                            </div>
+                            <br>
+                        </div>
+                        <div class="div-overzichtzk new-page-no-card w-100">
+                            <h4>KAART B: Overzicht van de beschikbare papieren zeekaartensets</h4>
+                            <div class="div-overzichtzksets-img">
+                                <img class="w-50 imgzk" src="./img/charts/P2 - Zeekaartensets.jpg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Lijst der afkortingen-->
+                <div id="Lijstderafk" class="div--kaartindex card p-5 mt-5 container-fluid new-page" style="scroll-margin-top:200px">
+                    <div class="div-kaartindex-title">
+                        <h3>IV. LIJST DER AFKORTINGEN</h3>
+                        <hr>
+                        <br>
+                    </div>
+                    <div class="div-kaartindex-content align-items-center w-100">
+                        <table class="table-kaartindex justify-content-center w-100">
+                            <thead class="table-kaartindex--head thead-intro">
+                                <!--                        Table header kaartindex                          -->
+                                <tr class="table-bordered h-100">
+                                </tr>
+                                <tbody class="table-correcties--body table-bordered h-100 w-100">
+                                    <tr>
+                                        <td>B</td>
+                                        <td>Zwart</td>
+                                        <td>Black</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bk</td>
+                                        <td>Bank</td>
+                                        <td>Banc</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRB</td>
+                                        <td>Zwart-rood-zwart</td>
+                                        <td>Black red black</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bu</td>
+                                        <td>Blauw</td>
+                                        <td>Blue</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BW</td>
+                                        <td>Zwart-wit</td>
+                                        <td>Black white</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BWgb</td>
+                                        <td>Zwart-wit geblokt</td>
+                                        <td>Black white chequered</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BWHS</td>
+                                        <td>Zwart-wit hor. gestreept</td>
+                                        <td>Black white hor. striped</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BWVS</td>
+                                        <td>Zwart-wit vert. gestreept</td>
+                                        <td>Black white vert. striped</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BY</td>
+                                        <td>Zwart-geel</td>
+                                        <td>Black yellow</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BYB</td>
+                                        <td>Zwart-geel-zwart</td>
+                                        <td>Black yellow black</td>
+                                    </tr>
+                                    <tr>
+                                        <td>cd</td>
+                                        <td>Candela (Internationale kaars)</td>
+                                        <td>Candela</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dir</td>
+                                        <td>Gericht licht</td>
+                                        <td>Fixed light</td>
+                                    </tr>
+                                    <tr>
+                                        <td>E</td>
+                                        <td>Oost</td>
+                                        <td>East</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ec</td>
+                                        <td>Verduistering</td>
+                                        <td>Eclipse</td>
+                                    </tr>
+                                    <tr>
+                                        <td>F</td>
+                                        <td>Vast</td>
+                                        <td>Fixed</td>
+                                    </tr>
+                                    <tr>
+                                        <td>(F)</td>
+                                        <td>Frankrijk</td>
+                                        <td>France</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fl</td>
+                                        <td>Schitter</td>
+                                        <td>Flashing</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fl(.)</td>
+                                        <td>Groepsschitter</td>
+                                        <td>Group-flashing</td>
+                                    </tr>
+                                    <tr>
+                                        <td>G</td>
+                                        <td>Groen</td>
+                                        <td>Green</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gb</td>
+                                        <td>Geblokt</td>
+                                        <td>Chequered</td>
+                                    </tr>
+                                    <tr>
+                                        <td>gl</td>
+                                        <td>Geleidelicht</td>
+                                        <td>Leading light</td>
+                                    </tr>
+                                    <tr>
+                                        <td>HL</td>
+                                        <td>Hoog licht</td>
+                                        <td>Rear light</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hvh</td>
+                                        <td>Havenhoofd</td>
+                                        <td>Pier</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hvl</td>
+                                        <td>Havenlicht</td>
+                                        <td>Harbour light</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hvn</td>
+                                        <td>Haven</td>
+                                        <td>Harbour</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Iso</td>
+                                        <td>Isofase</td>
+                                        <td>Isophase</td>
+                                    </tr>
+                                    <tr>
+                                        <td>kHz</td>
+                                        <td>Kilohertz</td>
+                                        <td>Kilohertz</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LL</td>
+                                        <td>Laag licht</td>
+                                        <td>Front light</td>
+                                    </tr>
+                                    <tr>
+                                        <td>lt</td>
+                                        <td>Licht (fase)</td>
+                                        <td>light (phase)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>m</td>
+                                        <td>Meter</td>
+                                        <td>Meter</td>
+                                    </tr>
+                                    <tr>
+                                        <td>M</td>
+                                        <td>Zeemijl</td>
+                                        <td>Nautical mile</td>
+                                    </tr>
+                                    <tr>
+                                        <td>min</td>
+                                        <td>Minuut</td>
+                                        <td>Minute</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mo</td>
+                                        <td>Morse</td>
+                                        <td>Morse code</td>
+                                    </tr>
+                                    <tr>
+                                        <td>mp</td>
+                                        <td>Meetpaal</td>
+                                        <td>Measuring pile</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MSL</td>
+                                        <td>Middenstandsvlak</td>
+                                        <td>Mean sea level</td>
+                                    </tr>
+                                    <tr>
+                                        <td>N</td>
+                                        <td>Noord</td>
+                                        <td>North</td>
+                                    </tr>
+                                    <tr>
+                                        <td>(N)</td>
+                                        <td>Nederland</td>
+                                        <td>the Netherlands</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nauto</td>
+                                        <td>Nautofoon</td>
+                                        <td>Nautophone</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ob</td>
+                                        <td>Verduisterd</td>
+                                        <td>Obscured</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oc</td>
+                                        <td>Onderbroken</td>
+                                        <td>Occulting</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oc(.)</td>
+                                        <td>Groep onderbroken</td>
+                                        <td>Group-occulting</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ong</td>
+                                        <td>Ongeveer</td>
+                                        <td>Approximate</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Or</td>
+                                        <td>Oranje</td>
+                                        <td>Orange</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Q</td>
+                                        <td>Flikker</td>
+                                        <td>Quick</td>
+                                    </tr>
+                                    <tr>
+                                        <td>R</td>
+                                        <td>Rood</td>
+                                        <td>Red</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ra.refl</td>
+                                        <td>Radarreflector</td>
+                                        <td>Radar reflector</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RW</td>
+                                        <td>Rood-wit</td>
+                                        <td>Red white</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rwgb</td>
+                                        <td>Rood-wit geblokt</td>
+                                        <td>Red white chequered</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RWHS</td>
+                                        <td>Rood-wit hor.gestreept</td>
+                                        <td>Red white hor.striped</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RWVS</td>
+                                        <td>Rood-wit vert. gestreept</td>
+                                        <td>Red white vert. striped</td>
+                                    </tr>
+                                    <tr>
+                                        <td>S</td>
+                                        <td>Zuid</td>
+                                        <td>South</td>
+                                    </tr>
+                                    <tr>
+                                        <td>s</td>
+                                        <td>Seconde</td>
+                                        <td>Second</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Vi</td>
+                                        <td>Violet</td>
+                                        <td>Violet</td>
+                                    </tr>
+                                    <tr>
+                                        <td>VQ</td>
+                                        <td>Snelle flikker</td>
+                                        <td>Very quick</td>
+                                    </tr>
+                                    <tr>
+                                        <td>W</td>
+                                        <td>West-wit</td>
+                                        <td>West-White</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Y</td>
+                                        <td>Geel</td>
+                                        <td>Yellow</td>
+                                    </tr>
+                                    <tr>
+                                        <td>YB</td>
+                                        <td>Geel-zwart</td>
+                                        <td>Yellow black</td>
+                                    </tr>
+                                    <tr>
+                                        <td>YBY</td>
+                                        <td>Geel-zwart-geel</td>
+                                        <td>Yellow black yellow</td>
+                                    </tr>
+                                </tbody>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <!--Inleiding-->
+                <div id="Inleiding" class="div--Inleiding card p-5 mt-5 container-fluid new-page" style="scroll-margin-top:200px">
+                    <div class="div-Inleiding-title">
+                        <h3>V. INLEIDING</h3>
+                        <hr>
+                        <br>
+                        <div id="Algemeen">
+                            <h4>1. Algemeen</h4>
+                            <br>
+                            <p>De lichtenlijst geeft een opsomming en beschrijving van vaste en vlottende lichten en mistseinen, dienstig voor de scheepvaart.</p>
+                            <br>
+                        </div>
+                        <div id="Opbouw">
+                            <h4>2. Opbouw lichtenlijst</h4>
+                            <br>
+                            <p><b>2.1</b> De lichten en mistseinen zijn gerangschikt volgens oplopende volgnummering, ingedeeld in zeegebieden (hoofdletters/vet) en onderverdeeld in vaarroutes (vet) Kustplaatsnamen staan vermeld in hoofdletters.</p>
+                            <p> <b>2.2</b> Het opzoeken van lichten wordt vergemakkelijkt door het gebruik van • een tabel met de corresponderende internationale en nationale lichtnummers; • een alfabetische index.</p>
+                        </div>
+
+                        <br>
+                        <!-- Definities-->
+                        <div id="Definities">
+                            <h4>3. Definities</h4>
+                            <br>
+                            <!-- 3.1 Lichten-->
+                            <div>
+                                <h5><b>3.1 Lichten</b></h5>
+                                <br>
+                                <div>
+                                    <table class="div--definities-termen table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <td class="text-center" colspan="2"><b>Algemene termen</b></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Karakter<br>Character</td>
+                                                <td>Kenmerkende combinaties van verschillende eigenschappen van een licht (verlicht, onverlicht, gekleurd of wit) die aan regelmatige- of ritmische verschijningsvormen kunnen worden herkend (b.v. een vast licht,
+                                                    schitterlicht, groepschitterlicht, kleurwisselend licht).</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Vast licht<br>Fixed light</td>
+                                                <td>Een licht dat zonder onderbreking of verandering van karakter en/of kleur wordt getoond.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Ritmisch licht<br>Rhythmic light</td>
+                                                <td>Een licht waarvan het karakter in regelmatig terugkerende periodes wordt getoond (schitter, groepsschitter, kleurwisselend).</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Kleurwisselend licht<br>Alternating light</td>
+                                                <td>Een ritmisch licht dat gedurende elke periode verschillende kleuren toont.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Periode<br>Period</td>
+                                                <td>De tijd waarin de gehele fase van het karakter wordt doorlopen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Fase<br>Phase</td>
+                                                <td>Elk opeenvolgend element van een ritmisch licht (schittering, verduistering).</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Peilingen<br>Bearings</td>
+                                                <td>Begrenzingen van lichtsectoren of zichtbaarheidsgrenzen van lichten. De grenzen van een sector worden aangegeven door ware richtingen, gezien vanaf de waarnemer op zee.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="new-page-no-card">
+                                    <table class="div--definities-beschrijvende table-bordered">
+                                        <thead>
+                                            <td class="text-center" colspan="2"><b>Beschrijvende termen</b></td>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Daglicht<br>Daylight</td>
+                                                <td>Licht dat 24u. per dag, zonder verandering van karakter, in werking is. De lichtsterkte kan overdag groter zijn.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Gericht licht<br>Direction light</td>
+                                                <td>Licht dat straalt in een zeer smalle sector en wordt gebruikt om een te volgen richting aan te geven.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lichthoogte<br>Elevation of a light</td>
+                                                <td>Verticale afstand (m) gemeten vanaf de lichtbron tot het middenstandsvlak of een ander gedefinieerd vlak.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mistlicht<br>Fog light</td>
+                                                <td>Licht dat alleen brandt tijdens verminderd zicht.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Hoogte lichtopstand<br>Height of structure</td>
+                                                <td>Verticale afstand (m) tussen voet en de top van de lichtopstand, inclusief op de top geplaatste seinen maar exclusief alle antennes en andere uitrustingen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Geleidelichten<br>Leading lights</td>
+                                                <td>Twee of meer afzonderlijk geplaatste lichten die in combinatie met elkaar een geleidelijn vormen die moet worden gevolgd.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lichten ineen<br>Lights in line</td>
+                                                <td>Lichten die in combinatie met elkaar een gevaar of begrenzing van een gebied aangeven.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Blink<br>Loom</td>
+                                                <td>Verstrooid licht dat als gevolg van atmosferische omstandigheden wordt waargenomen wanneer het licht zich onder de horizon of zich achter een obstakel bevindt.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lichtsterkte<br>Luminous intensity</td>
+                                                <td>Intensiteit van een lichtbron die in een bepaalde richting met een vaste lichtbundel wordt uitgestraald (intensiteit in candela’s).</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Hoofdlicht<br>Main light</td>
+                                                <td>Het belangrijkste licht in een groep van twee of meer lichten op dezelfde of op een nabijgelegen lichtopstand.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sectorlicht<br>Sector light</td>
+                                                <td>Licht waarvan de verschijningsvorm over de verschillende sectoren over de horizon anders is (voornamelijk in kleur).</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Hulplicht<br>Subsidiary light</td>
+                                                <td>Licht van ondergeschikt belang dat op of nabij een hoofdlicht is geplaatst en een speciale navigatiefunctie heeft: b.v. wanneer het dient als passeerlicht bij een lichtenlijn.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- 3.2 Geluidsseinen-->
+                            <div class="new-page-no-card">
+                                <h5><b>3.2 Geluidsseinen</b></h5>
+                                <br>
+                                <div>
+                                    <table class="div--definities-termen table-bordered">
+                                        <thead>
+                                            <td class="text-center" colspan="2"><b>Algemene termen</b></td>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Geluidssein<br>Sound signal</td>
+                                                <td>Geluid dat wordt uitgezonden om informatie over te brengen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mistsein<br>Fog signal</td>
+                                                <td>Geluidssignaal om schepen te waarschuwen of te begeleiden tijdens verminderd zicht.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mistsein met morse<br>Morse code fog signal</td>
+                                                <td>Mistsein, uitgezonden in 1 of meer morsecodekarakter(s).</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Waar bereik<br>True range</td>
+                                                <td>Maximale afstand, gemeten vanaf het punt van uitzenden, waarop, onder de heersende omstandig-heden, het uitgezonden signaal kan worden waargenomen.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <br>
+                                <div class="">
+                                    <table class="div--definities-beschrijvende table-bordered">
+                                        <thead>
+                                            <td class="text-center" colspan="2"><b>Mistsignalen en geluidproducerende toestellen</b></td>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Bel<br>Bell</td>
+                                                <td>Een metalen belvormige klok die een karakteristiek geluid produceert door erop te slaan;</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Diafoon<br>Diaphone</td>
+                                                <td>Instrument dat een karakteristiek geluid produceert doordat samengeperste lucht door een bewegend ventiel met luchtgaten wordt geperst. Zodoende kan er een tweetonig geluid ontstaan, waarvan de tweede toon
+                                                    een lagere frequentie heeft. Wanneer er slechts 1 toon wordt geproduceerd eindigt deze toon plotseling in een lagere toon, ook wel knorren of brommen genoemd.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Gong<br>Gong</td>
+                                                <td>Een platte schijf of klankkast die een duidelijk te herkennen resonant geluid voortbrengt.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Hoorn<br>Horn</td>
+                                                <td>Instrument bestaande uit een pijp waarvan de diameter varieert en dat een karakteristiek geluid voortbrengt.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Claxon<br>Klaxon</td>
+                                                <td>Klein soort nautofoon dat soms met de hand bediend wordt.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Membraanhoorn<br>Membrane horn</td>
+                                                <td>Het geluid wordt geproduceerd door met behulp van samengeperste lucht, stoom of elektriciteit een membraan in trilling te brengen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nautofoon<br>Nautophone</td>
+                                                <td>Het geluid wordt geproduceerd door met behulp van elektriciteit een membraan in trilling te brengen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Fluit<br>Reed</td>
+                                                <td>Het schelle geluid wordt geproduceerd door met behulp van samengeperste lucht of door middel van stoom een riet in trilling te brengen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tyfoon<br>Typhon</td>
+                                                <td>Het geluid wordt geproduceerd door met behulp van stoom of samengeperste lucht een membraan in trilling te brengen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sirene<br>Siren</td>
+                                                <td>Zwaar klinkend mistwaarschuwingssignaal. Het geluid wordt geproduceerd door lucht door sleuven of gaten van een roterende schijf te persen.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Toeter<br>Hooter</td>
+                                                <td>Instrument dat een geluid produceert waarvan de geluidsfrequentie periodiek varieert rond een gemiddelde frequentie.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Fluit<br>Whistle</td>
+                                                <td>Instrument dat een schril geluid produceert d.m.v. het sturen van samengeperste lucht of stoom door een opening.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- Kolomindeling lichtenlijst-->
+                        <div id="Kolomindeling" class="div-kolomindeling new-page">
+                            <h4>4. Kolomindeling lichtenlijst</h4>
+                            <br>
+                            <p>De lichten en mistsignalen zijn opgesomd en beschreven in een tabel met 8 kolommen.</p>
+                            <div class="div-kolomindeling-tbl_kolom">
+                                <table class="table table-borderless w-50">
+                                    <tbody>
+                                        <tr>
+                                            <td>Kolom 1</td>
+                                            <td>Het nationaal en internationaal nummer</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 2</td>
+                                            <td>Gebied, naam en plaats</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 3</td>
+                                            <td>Breedte en lengte</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 4</td>
+                                            <td>Karakter, kleur, periode van het licht en lichtsterkte</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 5</td>
+                                            <td>Hoogte in m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 6</td>
+                                            <td>Nominale dracht in M</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 7</td>
+                                            <td>Beschrijving van de lichtopstand</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kolom 8</td>
+                                            <td>Bijkomende informatie</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="div-kolomindeling-tekst">
+                                <p>
+                                    <b>4.1.</b> Volgnummer van het licht met daaronder het overeenstemmend internationaal nummer (cursief) d.w.z. het nummer waaronder het licht is opgenomen in de Britse “Admiralty of Lights”, met aanduiding van het betreffende
+                                    boekdeel door de letters A of B.</p>
+                                <p>
+                                    <b>4.2.</b> Gebied, naam en plaats<br> Franse en Nederlandse lichten zijn resp. aangeduid door (F) en (N). Geografische plaatsnamen worden in HOOFDLETTERS gedrukt. De benaming van drijvende lichten wordt cursief vermeld.
+                                    Op land geplaatste lichten met een nominale dracht groter of gelijk aan 15 M, worden vet afgedrukt.</p>
+                                <p>
+                                    <b>4.3.</b> De geografische posities in WGS84 zijn uitgedrukt tot op een honderdste van een minuut.</p>
+                                <p>
+                                    <b>4.4.</b> Het karakter, het ritme, de kleur, de periode in seconden, eventueel een aanvullende term en de lichtsterkte. De periode is het tijdsverloop waarin eenmaal alle fasen van het karakter worden doorlopen. De
+                                    eenheid voor lichtsterkte wordt uitgedrukt in candela en wordt, indien gekend, cursief vermeld. De kleur van het licht wordt aangeduid door W (wit), Y (geel of oranje), G (groen), R (rood) of Vi (violet). De aandacht
+                                    wordt gevestigd op het feit dat bij grote afstanden en bepaalde atmosferische omstandigheden, de witte en soms zelfs de groene lichten de indruk kunnen geven als zijnde rood.</p>
+                                <p>
+                                    Voor mistseinen wordt de volgende informatie gegeven in internationaal geldende standaards: de aard van de geluidsbron met het aantal geluidssignalen dat wordt uitgezonden (ritme) en de periode.</p>
+                                <p>
+                                    De tabellen op de volgende bladzijden geven een beschrijving van de verschillende lichtkarakters met telkens het daarbij horende voorbeeld.</p>
+
+                            </div>
+                            <div class="div-kolomindeling-tbl_lichkarakters new-page-no-card">
+                                <table class="table-bordered w-100">
+                                    <thead class="text-center">
+                                        <td>Beschrijvende termen</td>
+                                        <td>Class of light</td>
+                                        <td>Int. afkorting</td>
+                                        <td>Voorbeeld</td>
+                                    </thead>
+                                    <tbody class="tbody-litchr">
+                                        <tr>
+                                            <td><b>1. Vast licht</b></td>
+                                            <td>Fixed</td>
+                                            <td>F</td>
+                                            <td><img class="img-litchr" src='./img/litchr/1_litchr_fixed.jpg'></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="4"><b>2. Onderbroken licht</b> (langer licht dan donker)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2.1. Onderbroken licht</td>
+                                            <td>(Single)-Occulting</td>
+                                            <td>Oc</td>
+                                            <td><img class="img-litchr" src='./img/litchr/2_1_litchr_occulting.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2.2. Groeponderbroken licht</td>
+                                            <td>Group-occulting</td>
+                                            <td>Oc(#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/2_2_litchr_group-occulting.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2.3. Samengesteld groeponderbroken licht</td>
+                                            <td>Composite group-occulting</td>
+                                            <td>Oc(#+#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/2_3_litchr_comp-group-occulting.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>3. Isofase licht (periode licht is gelijk aan periode donker)</td>
+                                            <td>Isophase</td>
+                                            <td>Iso</td>
+                                            <td><img class="img-litchr" src='./img/litchr/3_litchr_Isophased.jpg'></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="4"><b>4. Schitterlicht</b> (langer donker dan licht en tempo
+                                                < 50 sch./min)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4.1. Schitterlicht</td>
+                                            <td>Single-flashing</td>
+                                            <td>Fl</td>
+                                            <td><img class="img-litchr" src='./img/litchr/4_1_litchr_Flashing.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>4.2. Lang schitterlicht</td>
+                                            <td>Long-flashing</td>
+                                            <td>LFl</td>
+                                            <td><img class="img-litchr" src='./img/litchr/4_2_litchr_group-flashing.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>4.3. Groepschitterlicht</td>
+                                            <td>Group-flashing</td>
+                                            <td>Fl(#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/4_3_litchr_composite-group-flashing.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>4.4. Samengesteld groepschitter licht</td>
+                                            <td>Composite group-flashing</td>
+                                            <td>Fl(#+#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/4_4_litchr_long-flashing.jpg'></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="4"><b>5. Flikkerlicht</b> (snelheid van de schitteringen tussen 50 tot 80 per minuut)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5.1. Flikkerlicht</td>
+                                            <td>Continuous quick</td>
+                                            <td>Q</td>
+                                            <td><img class="img-litchr" src='./img/litchr/5_1_litchr_continuous-quick.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>5.2. Groepflikkerlicht</td>
+                                            <td>Group quick</td>
+                                            <td>Q(#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/5_2_litchr_group-quick.jpg'></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="4"><b>6. Snel flikkerlicht</b> (snelheid van schitteringen tussen 80 en 160 per minuut)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>6.1. Snel flikkerlicht</td>
+                                            <td>Continuous very quick</td>
+                                            <td>VQ</td>
+                                            <td><img class="img-litchr" src='./img/litchr/6_1_litchr_continuous-very-quick.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>6.2. Groep snel flikkerlicht</td>
+                                            <td>Group very quick</td>
+                                            <td>VQ(#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/6_2_litchr_group-very-quick.jpg'></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="4"><b>7. Ultrasnel flikkerlicht</b>(snelheid van schitteringen van tenminste 160 en gewoonlijk 240-300 per minuut)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7.1. Ultrasnel flikkerlicht</td>
+                                            <td>Continuous ultra quick</td>
+                                            <td>UQ</td>
+                                            <td></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="4"><b>8. Bijzondere lichten</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8.1. Morse-code licht</td>
+                                            <td>Morse code</td>
+                                            <td>Mo(#)</td>
+                                            <td><img class="img-litchr" src='./img/litchr/8_1_litchr_morse-code.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8.2. Vast- en schitterlicht</td>
+                                            <td>Fixed and flashing</td>
+                                            <td>FFl</td>
+                                            <td><img class="img-litchr" src='./img/litchr/8_2_litchr_fixed-and-flashing.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8.3. Alternerend, kleurwisselend licht</td>
+                                            <td>Alternating</td>
+                                            <td>Al##</td>
+                                            <td><img class="img-litchr" src='./img/litchr/8_3_litchr_alternating.jpg'></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8.4. Onderbroken, alternerend licht</td>
+                                            <td>Occulting alternating</td>
+                                            <td>OAL</td>
+                                            <td><img class="img-litchr" src='./img/litchr/8.4_occulting-alternating.jpg'></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="div-kolomindeling-tekst new-page-no-card">
+                                <br>
+                                <p><b>5.</b> De hoogte van de lichtbron of van het midden van de lichtbron (neonbuizen), in meter boven zeeniveau. Het referentievlak voor de vaste lichten is de middenstand van de zeespiegel (MSL).</p>
+                                <br>
+                                <p><b>6.</b>. De nominale dracht in zeemijl (M), in <b>vet</b> gedrukte cijfers als groter of gelijk aan 15 M, anders in gewone cijfers. Wanneer een licht verschillende kleursectoren heeft, wordt na elke kleur van de sector
+                                    de dracht vermeld. Om bij een gegeven afstand een licht te kunnen waarnemen, moet het:
+                                    <ul>
+                                        <li>zich t.o.v. de waarnemer boven de schijnbare horizon bevinden;</li>
+                                        <li>een voldoende lichtsterkte hebben;</li>
+                                        <li>niet worden verduisterd door meteorologische omstandigheden tussen waarnemer en lichtbron.</li>
+                                    </ul>
+                                    <br>
+                                    <b>De geografische dracht</b> hangt af van de hoogte van het licht, de ooghoogte van de waarnemer en van de atmosferische straalbreking. De tabel “Geografische dracht” verderop in deze inleiding geeft de geografische
+                                    dracht in zeemijlen in functie van de ooghoogte van de waarnemer en de hoogte van de lichtbron in meter. In sommige gevallen dient de hoogte van het licht te worden gecorrigeerd voor het getij.
+                                    <br>
+                                    <b>De optische dracht</b> van het licht hangt voornamelijk af van zijn lichtsterkte en de helderheid van de lucht en in mindere mate van het karakter, de duur van de schitteringen en de intervallen ertussen.
+                                    <br> De lichtsterkte (candela’s) mag, indien bekend, cursief vermeld worden in kolom 4. Weerstations zenden gegevens over het horizontale zicht boven het wateroppervlak in kilometer uit voor een bepaalde periode en
+                                    gebied, op een schaal van 0 tot 9 (code VV - zie blz. XXII). Het diagram “Optische dracht” verderop in deze inleiding laat toe de optische dracht te bepalen volgens haar lichtsterkte (candela’s) en horizontale zichtbaarheid
+                                    (zeemijlen).
+                                    <br> B.v. bij een nominale dracht van 10 M (of een lichtsterkte van 1300 candela’s) en een zichtbaarheid van 7 (tussen 10 en 20 km), zal de optische dracht liggen tussen 6,5 en 10 M.
+                                    <br>
+                                    <b>De nominale dracht</b> is de optische dracht in een homogene atmosfeer bij een meteorologische zichtbaarheid van 10 M.</p>
+                                <br>
+                                <p><b>7.</b> De beschrijving en hoogte van de opstand. Hiermee wordt bedoeld, de verticale hoogte in m, gemeten vanaf de voet tot aan de top van de constructie, niet inbegrepen antennes e.d. Als beschrijving geldt de vorm,
+                                    het gebruikte materiaal en de kleur(en). Voor de vlottende bebakening wordt het topteken, de kleur, de aanwezigheid van een radarreflector en het opschrift vermeld.</p>
+                                <br>
+                                <p><b>8.</b> Aanvullende informatie over o.a. lichtsectoren, zichtbaarheid van sectoren, lichtenlijnen, verkeersen mistseinen. De sectorgrenzen, evenals peilingen en lichtenlijnen, zijn ware richtingen van 0° (noord) tot 360°
+                                    gerekend vanaf de waarnemer volgens wijzerzin. Peilingen worden gegeven vanuit zee, in graden of, indien nodig, in tienden graad.
+                            </div>
+                        </div>
+
+                        <!-- informatie mbt de lichten-->
+                        <div id="Informatie" class="div-informatie new-page">
+                            <h4>5. Informatie met betrekking tot lichten</h4>
+                            <br>
+                            <p><b>5.1 Algemeen</b>
+                                <br>
+                                <ul>
+                                    <li>Wolken verduisteren vaker lichten met een grote hoogte boven zeeniveau dan lichten met een kleine hoogte.
+                                    </li>
+                                    <li>Drijvende lichten kunnen zonder bericht opgenomen worden voor herstelling en niet teruggeplaatst.</li>
+                                    <li>Positie en toestand van een lichtboei dienen met de nodige omzichtigheid behandeld te worden. Lichten van luchtvaartbakens hebben vaak een grote lichtsterkte en hoogte boven het zeeniveau en worden daardoor op veel
+                                        grotere afstanden waargenomen dan kustverlichting ten behoeve van de scheepvaart.
+                                        <br> Waarschuwing: Luchtvaartbakens worden door andere instanties onderhouden dan de kustverlichting. Daardoor is het mogelijk dat kleur en/of karakter van deze lichten gewijzigd worden voordat de scheepvaart via
+                                        de Berichten aan Zeevarenden daarvan op de hoogte gesteld wordt.</li>
+                                </ul>
+                            </p>
+                            <br>
+                            <p><b>5.2 Zichtbaarheid-dracht</b>
+                                <br>
+                                <ul>
+                                    <li>De afstand tussen een licht en een waarnemer kan niet geschat worden wanneer de schijnbare helderheid wordt gebruikt.</li>
+                                    <li>Mist, nevel, stof, rook en regen zijn factoren die de dracht van een licht aanzienlijk kunnen reduceren.</li>
+                                    <li>Een helder verlicht gebied achter een licht kan, in negatieve zin, van grote invloed zijn op de zichtbaarheid van dat licht.</li>
+                                    <li>De zichtbaarheid van een licht kan gereduceerd worden door afzetting van ijs, rijp of condens op de lens van het licht. Bovendien kunnen daardoor sommige kleuren als wit worden aangezien.</li>
+                            </p>
+                            </ul>
+                            <br>
+                            <p><b>5.3 Kleuren</b>
+                                <br>
+                                <br> Er moet met zorg worden omgegaan met kleurverschillen. Straalbreking van het licht in de atmosfeer en ooginspanningen van de waarnemer kunnen er toe bijdragen dat kleuren moeilijker te onderscheiden zijn. ‘s Nachts
+                                is op afstand een wit licht moeilijk te onderscheiden van een geel of een blauw licht. Onder bepaalde atmosferische omstandigheden kan een wit licht worden aangezien als roodachtig van kleur. Overdag worden kleuren onduidelijk
+                                wanneer tegen de zon moet worden ingekeken, en een helder rood licht kan als een oranje licht worden aangezien. In het bijzonder kan dit gelden voor kleurwisselende lichten.
+                            </p>
+                            <br>
+                            <p><b>5.4 Karakters</b>
+                                <br>
+                                <ul>
+                                    <li>Van faselichten met variërende optische intensiteiten (lichtsterkten), kunnen, afhankelijk van de afstand van waaruit zij worden waargenomen, de schijnbare karakters verschillen, omdat bepaalde fasen niet kunnen worden
+                                        onderscheiden.
+                                    </li>
+                                    <li>Lichten met erg korte schitteringen hoeven niet op de verwachte afstanden zichtbaar te zijn.</li>
+                                    <li>De tijdsduur van een korte schittering kan kleiner lijken wanneer het wordt waargenomen vanaf een afstand die dicht bij de maximum dracht ligt en onder slechte atmosferische omstandigheden.</li>
+                                    <li>De schijnbare karakters van drijvende lichten moeten met omzichtigheid worden behandeld daar ze volledig kunnen verschillen van de eigenlijke karakters. Dit is te wijten aan de voortdurende wijzigingen in hoogte en
+                                        oriëntatie van het licht.</li>
+                                </ul>
+                            </p>
+                            <br>
+                            <p><b>5.5 Sectoren</b>
+                                <br>
+                                <br> In veel gevallen moet men omzichtig te werk gaan met de begrenzingen van sectoren. Over het algemeen zijn zij matig gedefinieerd, met verlichte en onverlichte sectoren die geleidelijk in elkaar overlopen. Kleurveranderingen
+                                tussen de sectoren lopen ook geleidelijk in elkaar over, niet zelden over enkele graden.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Verkeersseinen-->
+                <div id="Verkeersseinen" class="div--verkeersseinen card p-5 mt-5 container-fluid new-page" style="scroll-margin-top:200px">
+                    <div class="div-verkeersseinen-title">
+                        <h3>VI. VERKEERSSEINEN</h3>
+                        <hr>
+                        <br>
+                        <div class="div-verkeersseinen-content">
+                            <p>Volgende internationale seinen worden gehesen:</p>
+                            <br>
+                            <ol>
+                                <li>In Oostende, op de hoge seinmast (aan de basis van het vroegere oosterstaketsel);</li><br>
+                                <li>In Zeebrugge, op panelen geplaatst op de koppen van de westelijke en oostelijke strekdam en aan de seinmast (kop oude havendam).</li><br>
+                            </ol>
+                            <br>
+                            <p>N.B.: in Oostende wordt bovendien, zowel overdag als ‘s nachts een geel flikkerlicht ontstoken:</p><br>
+                            <p>(1) op het gebouw van DAB Vloot, wanneer de haveningang - buiten de koppen van de hoofden - en de havengeul tot aan de Demeysluis door alle vaartuigen vrijgehouden moet worden;</p><br>
+                            <p>(2) aan de ingang van het Montgomerydok en ter regeling van het verkeer naar de havengeul werd een geel flikkerlicht geplaatst met daaronder twee verkeersborden, landwaarts gericht, het bovenste met rode, het onderste met groene
+                                pijlen;
+                            </p><br>
+                            <p>(3) aan de ingang van de visserssluis (Maritiem Plein), zijn onder een geel flikkerlicht twee verkeersborden geplaatst, landwaarts gericht en voorzien van rode, resp. groene pijlen.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Tabel Geografische dracht-->
+                <div id="Tabel_geo_dracht" class="div--tabel_geo_dracht card p-5 mt-5 container-fluid new-page" style="scroll-margin-top:200px">
+                    <div class="div-tabel_geo_dracht-title">
+                        <h3>VII. TABEL 'GEOGRAFISCHE DRACHT'</h3>
+                        <hr>
+                        <br>
+                        <div class="div-tabel_geo_dracht-content d-flex justify-content-center">
+                            <table class="table-geodracht table-bordered">
+                                <thead>
+                                    <tr>
+                                        <td>Hoogte voorwerp boven water</td>
+                                        <td colspan="15">Hoogte oog boven water in m</td>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbody-geodracht">
+                                    <tr>
+                                        <td>in m</td>
+                                        <td>0</td>
+                                        <td>1.5</td>
+                                        <td>3</td>
+                                        <td>5</td>
+                                        <td>6</td>
+                                        <td>8</td>
+                                        <td>10</td>
+                                        <td>12</td>
+                                        <td>14</td>
+                                        <td>16</td>
+                                        <td>18</td>
+                                        <td>20</td>
+                                        <td>23</td>
+                                        <td>26</td>
+                                        <td>29</td>
+                                    </tr>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>2.5</td>
+                                        <td>3.5</td>
+                                        <td>4.5</td>
+                                        <td>5.0</td>
+                                        <td>5.7</td>
+                                        <td>6.4</td>
+                                        <td>7.0</td>
+                                        <td>7.6</td>
+                                        <td>8.1</td>
+                                        <td>8.6</td>
+                                        <td>9.0</td>
+                                        <td>9.7</td>
+                                        <td>10.3</td>
+                                        <td>10.9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>6.4</td>
+                                        <td>8.9</td>
+                                        <td>9.9</td>
+                                        <td>10.9</td>
+                                        <td>11.3</td>
+                                        <td>12.1</td>
+                                        <td>12.8</td>
+                                        <td>13.4</td>
+                                        <td>14.0</td>
+                                        <td>14.5</td>
+                                        <td>15.0</td>
+                                        <td>15.4</td>
+                                        <td>16.1</td>
+                                        <td>16.7</td>
+                                        <td>17.3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12</td>
+                                        <td>7.0</td>
+                                        <td>9.5</td>
+                                        <td>10.5</td>
+                                        <td>11.6</td>
+                                        <td>12.0</td>
+                                        <td>12.7</td>
+                                        <td>13.4</td>
+                                        <td>14.0</td>
+                                        <td>14.6</td>
+                                        <td>15.1</td>
+                                        <td>15.6</td>
+                                        <td>16.0</td>
+                                        <td>16.7</td>
+                                        <td>17.3</td>
+                                        <td>17.9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14</td>
+                                        <td>7.6</td>
+                                        <td>10.0</td>
+                                        <td>11.1</td>
+                                        <td>12.2</td>
+                                        <td>12.5</td>
+                                        <td>13.3</td>
+                                        <td>14.0</td>
+                                        <td>14.6</td>
+                                        <td>15.1</td>
+                                        <td>15.6</td>
+                                        <td>16.1</td>
+                                        <td>16.6</td>
+                                        <td>17.3</td>
+                                        <td>17.9</td>
+                                        <td>18.4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16</td>
+                                        <td>8.1</td>
+                                        <td>10.6</td>
+                                        <td>11.6</td>
+                                        <td>12.7</td>
+                                        <td>13.0</td>
+                                        <td>13.8</td>
+                                        <td>14.5</td>
+                                        <td>15.1</td>
+                                        <td>15.6</td>
+                                        <td>16.2</td>
+                                        <td>16.7</td>
+                                        <td>17.1</td>
+                                        <td>17.8</td>
+                                        <td>18.4</td>
+                                        <td>19.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>18</td>
+                                        <td>8.6</td>
+                                        <td>11.0</td>
+                                        <td>12.1</td>
+                                        <td>13.2</td>
+                                        <td>13.5</td>
+                                        <td>14.3</td>
+                                        <td>15.0</td>
+                                        <td>15.6</td>
+                                        <td>16.1</td>
+                                        <td>16.7</td>
+                                        <td>17.1</td>
+                                        <td>17.6</td>
+                                        <td>18.3</td>
+                                        <td>18.9</td>
+                                        <td>19.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20</td>
+                                        <td>9.0</td>
+                                        <td>11.5</td>
+                                        <td>12.5</td>
+                                        <td>13.7</td>
+                                        <td>14.0</td>
+                                        <td>14.8</td>
+                                        <td>15.4</td>
+                                        <td>16.0</td>
+                                        <td>16.6</td>
+                                        <td>17.1</td>
+                                        <td>17.6</td>
+                                        <td>18.1</td>
+                                        <td>18.7</td>
+                                        <td>19.3</td>
+                                        <td>19.9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>23</td>
+                                        <td>9.7</td>
+                                        <td>12.2</td>
+                                        <td>13.2</td>
+                                        <td>14.4</td>
+                                        <td>14.6</td>
+                                        <td>15.4</td>
+                                        <td>16.1</td>
+                                        <td>16.7</td>
+                                        <td>17.3</td>
+                                        <td>17.8</td>
+                                        <td>18.3</td>
+                                        <td>18.7</td>
+                                        <td>19.4</td>
+                                        <td>20.0</td>
+                                        <td>20.6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>26</td>
+                                        <td>10.3</td>
+                                        <td>12.8</td>
+                                        <td>13.8</td>
+                                        <td>14.9</td>
+                                        <td>15.3</td>
+                                        <td>16.0</td>
+                                        <td>16.7</td>
+                                        <td>17.3</td>
+                                        <td>17.9</td>
+                                        <td>18.4</td>
+                                        <td>18.9</td>
+                                        <td>19.3</td>
+                                        <td>20.0</td>
+                                        <td>20.6</td>
+                                        <td>21.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>29</td>
+                                        <td>10.9</td>
+                                        <td>13.4</td>
+                                        <td>14.4</td>
+                                        <td>15.5</td>
+                                        <td>15.8</td>
+                                        <td>16.6</td>
+                                        <td>17.3</td>
+                                        <td>17.9</td>
+                                        <td>18.4</td>
+                                        <td>19.0</td>
+                                        <td>19.5</td>
+                                        <td>19.9</td>
+                                        <td>20.6</td>
+                                        <td>21.2</td>
+                                        <td>21.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>32</td>
+                                        <td>11.4</td>
+                                        <td>13.9</td>
+                                        <td>14.9</td>
+                                        <td>16.0</td>
+                                        <td>16.4</td>
+                                        <td>17.1</td>
+                                        <td>17.8</td>
+                                        <td>18.4</td>
+                                        <td>19.0</td>
+                                        <td>19.5</td>
+                                        <td>20.0</td>
+                                        <td>20.5</td>
+                                        <td>21.1</td>
+                                        <td>21.7</td>
+                                        <td>22.3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>36</td>
+                                        <td>12.1</td>
+                                        <td>14.6</td>
+                                        <td>15.6</td>
+                                        <td>16.7</td>
+                                        <td>17.1</td>
+                                        <td>17.8</td>
+                                        <td>18.5</td>
+                                        <td>19.1</td>
+                                        <td>19.7</td>
+                                        <td>20.2</td>
+                                        <td>20.7</td>
+                                        <td>21.2</td>
+                                        <td>21.8</td>
+                                        <td>22.4</td>
+                                        <td>23.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40</td>
+                                        <td>12.8</td>
+                                        <td>15.3</td>
+                                        <td>16.3</td>
+                                        <td>17.4</td>
+                                        <td>17.7</td>
+                                        <td>18.5</td>
+                                        <td>19.2</td>
+                                        <td>19.8</td>
+                                        <td>20.3</td>
+                                        <td>20.9</td>
+                                        <td>21.4</td>
+                                        <td>21.8</td>
+                                        <td>22.5</td>
+                                        <td>23.1</td>
+                                        <td>23.7</td>
+                                    </tr>
+                                    <tr>
+                                        <td>45</td>
+                                        <td>13.6</td>
+                                        <td>16.0</td>
+                                        <td>17.1</td>
+                                        <td>18.1</td>
+                                        <td>18.5</td>
+                                        <td>19.3</td>
+                                        <td>19.9</td>
+                                        <td>20.6</td>
+                                        <td>21.1</td>
+                                        <td>21.6</td>
+                                        <td>22.1</td>
+                                        <td>22.6</td>
+                                        <td>23.2</td>
+                                        <td>23.9</td>
+                                        <td>24.4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50</td>
+                                        <td>14.3</td>
+                                        <td>16.8</td>
+                                        <td>17.8</td>
+                                        <td>18.9</td>
+                                        <td>19.2</td>
+                                        <td>20.0</td>
+                                        <td>20.7</td>
+                                        <td>21.3</td>
+                                        <td>21.9</td>
+                                        <td>22.4</td>
+                                        <td>22.9</td>
+                                        <td>23.3</td>
+                                        <td>24.0</td>
+                                        <td>24.6</td>
+                                        <td>25.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>55</td>
+                                        <td>15.0</td>
+                                        <td>17.5</td>
+                                        <td>18.5</td>
+                                        <td>19.6</td>
+                                        <td>19.9</td>
+                                        <td>20.7</td>
+                                        <td>21.4</td>
+                                        <td>22.0</td>
+                                        <td>22.5</td>
+                                        <td>23.1</td>
+                                        <td>23.6</td>
+                                        <td>24.0</td>
+                                        <td>24.7</td>
+                                        <td>25.3</td>
+                                        <td>25.9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60</td>
+                                        <td>15.7</td>
+                                        <td>18.1</td>
+                                        <td>19.2</td>
+                                        <td>20.2</td>
+                                        <td>20.6</td>
+                                        <td>21.4</td>
+                                        <td>22.0</td>
+                                        <td>22.7</td>
+                                        <td>23.2</td>
+                                        <td>23.7</td>
+                                        <td>24.2</td>
+                                        <td>24.7</td>
+                                        <td>25.3</td>
+                                        <td>26.0</td>
+                                        <td>26.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70</td>
+                                        <td>16.9</td>
+                                        <td>19.4</td>
+                                        <td>20.4</td>
+                                        <td>21.5</td>
+                                        <td>21.9</td>
+                                        <td>22.6</td>
+                                        <td>23.3</td>
+                                        <td>23.9</td>
+                                        <td>24.5</td>
+                                        <td>25.0</td>
+                                        <td>25.5</td>
+                                        <td>25.9</td>
+                                        <td>26.6</td>
+                                        <td>27.2</td>
+                                        <td>27.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80</td>
+                                        <td>18.1</td>
+                                        <td>20.6</td>
+                                        <td>21.6</td>
+                                        <td>22.7</td>
+                                        <td>23.0</td>
+                                        <td>23.8</td>
+                                        <td>24.5</td>
+                                        <td>25.1</td>
+                                        <td>25.6</td>
+                                        <td>26.2</td>
+                                        <td>26.6</td>
+                                        <td>27.1</td>
+                                        <td>27.8</td>
+                                        <td>28.4</td>
+                                        <td>29.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90</td>
+                                        <td>19.2</td>
+                                        <td>21.6</td>
+                                        <td>22.7</td>
+                                        <td>23.7</td>
+                                        <td>24.1</td>
+                                        <td>24.9</td>
+                                        <td>25.6</td>
+                                        <td>26.2</td>
+                                        <td>26.7</td>
+                                        <td>27.3</td>
+                                        <td>27.7</td>
+                                        <td>28.2</td>
+                                        <td>28.9</td>
+                                        <td>29.5</td>
+                                        <td>30.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100</td>
+                                        <td>20.2</td>
+                                        <td>22.7</td>
+                                        <td>23.7</td>
+                                        <td>24.7</td>
+                                        <td>25.2</td>
+                                        <td>25.9</td>
+                                        <td>26.6</td>
+                                        <td>27.2</td>
+                                        <td>27.8</td>
+                                        <td>28.3</td>
+                                        <td>28.8</td>
+                                        <td>29.2</td>
+                                        <td>29.9</td>
+                                        <td>30.5</td>
+                                        <td>31.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>125</td>
+                                        <td>22.6</td>
+                                        <td>25.1</td>
+                                        <td>26.1</td>
+                                        <td>27.2</td>
+                                        <td>27.5</td>
+                                        <td>28.3</td>
+                                        <td>29.0</td>
+                                        <td>29.6</td>
+                                        <td>30.2</td>
+                                        <td>30.7</td>
+                                        <td>31.2</td>
+                                        <td>31.6</td>
+                                        <td>32.3</td>
+                                        <td>32.9</td>
+                                        <td>33.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>150</td>
+                                        <td>24.8</td>
+                                        <td>27.2</td>
+                                        <td>28.3</td>
+                                        <td>29.3</td>
+                                        <td>29.7</td>
+                                        <td>30.5</td>
+                                        <td>31.1</td>
+                                        <td>31.8</td>
+                                        <td>32.3</td>
+                                        <td>32.8</td>
+                                        <td>33.3</td>
+                                        <td>33.8</td>
+                                        <td>34.4</td>
+                                        <td>35.1</td>
+                                        <td>35.6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>175</td>
+                                        <td>26.7</td>
+                                        <td>29.2</td>
+                                        <td>30.2</td>
+                                        <td>31.2</td>
+                                        <td>31.7</td>
+                                        <td>32.4</td>
+                                        <td>33.1</td>
+                                        <td>33.7</td>
+                                        <td>34.3</td>
+                                        <td>34.8</td>
+                                        <td>35.3</td>
+                                        <td>35.8</td>
+                                        <td>36.4</td>
+                                        <td>37.0</td>
+                                        <td>37.6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200</td>
+                                        <td>28.6</td>
+                                        <td>31.1</td>
+                                        <td>32.1</td>
+                                        <td>33.1</td>
+                                        <td>33.5</td>
+                                        <td>34.3</td>
+                                        <td>35.0</td>
+                                        <td>35.6</td>
+                                        <td>36.1</td>
+                                        <td>36.7</td>
+                                        <td>37.2</td>
+                                        <td>37.6</td>
+                                        <td>38.3</td>
+                                        <td>38.9</td>
+                                        <td>39.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>250</td>
+                                        <td>32.0</td>
+                                        <td>34.4</td>
+                                        <td>35.5</td>
+                                        <td>36.5</td>
+                                        <td>36.9</td>
+                                        <td>37.7</td>
+                                        <td>38.3</td>
+                                        <td>39.0</td>
+                                        <td>39.5</td>
+                                        <td>40.0</td>
+                                        <td>40.5</td>
+                                        <td>41.0</td>
+                                        <td>41.6</td>
+                                        <td>42.3</td>
+                                        <td>42.8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>300</td>
+                                        <td>35.0</td>
+                                        <td>37.5</td>
+                                        <td>38.5</td>
+                                        <td>39.6</td>
+                                        <td>40.0</td>
+                                        <td>40.7</td>
+                                        <td>41.4</td>
+                                        <td>42.0</td>
+                                        <td>42.6</td>
+                                        <td>43.1</td>
+                                        <td>43.6</td>
+                                        <td>44.0</td>
+                                        <td>44.7</td>
+                                        <td>45.3</td>
+                                        <td>45.9</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <br>
+                        <div>
+                            <br>
+                            <div>
+                                <p>De opgegeven waarden verdienen geen onbeperkt vertrouwen. De werkelijke waarden kunnen, wegens het erg veranderlijk gedrag van de aardse straalbuiging, in hoge mate van de gegeven waarden afwijken.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div id="Diagram" class="div-tabel_geo_dracht-title card p-5 mt-5 container-fluid new-page" style="scroll-margin-top:200px">
+                        <div class="w-100 justify-content-center">
+                            <h3>VIII. DIAGRAM</h3>
+                            <hr>
+                            <br>
+
+                            <img src="img/graphs/graph_lights_geo_draught.jpg" class="w-100">
+                            <p class="align-self-center">® : VVcode voor het meteorologisch zicht<br> --- : Optische dracht=geografische dracht</p>
+                        </div>
+                    </div>
+                    <div class="div-toelichting_diagram card p-5 mt-5 container-fluid new-page">
+                        <div class="w-100 justify-content-center"></div>
+                        <h3>IX. TOELICHTING DIAGRAM</h3>
+                        <hr>
+                        <br>
+                        <p>De optische dracht is de afstand waarop een licht nog juist zichtbaar is, rekening houdende met zijn lichtsterkte (in candela’s) of zijn nominale dracht (in zeemijlen) en met de (veranderlijke) doorlatingsgraad van de atmosfeer.</p>
+                        <br>
+                        <br>
+                        <div class=" d-flex justify-content-center">
+                            <table class="table-bordered text-center w-50">
+                                <thead>
+                                    <tr>
+                                        <td colspan="2">VV code</td>
+                                        <td>Meteorologische zichtbaarheid</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>minder dan 50 m</td>
+                                        <td>zeer dikke mist</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>van 50 tot 200 m</td>
+                                        <td>dikke mist</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>van 200 tot 500 m</td>
+                                        <td>mist</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>van 0.5 tot 1 km</td>
+                                        <td>mistig</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>van 1 tot 2 km</td>
+                                        <td>nevelig</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>van 2 tot 4 km</td>
+                                        <td>slecht zicht</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>van 4 tot 10 km</td>
+                                        <td>matig zicht</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>van 10 tot 20 km</td>
+                                        <td>vrij goed zicht</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>van 20 tot 50 km</td>
+                                        <td>helder</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>meer dan 50 km</td>
+                                        <td>zeer helder</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="div-toelichting-text">
+                            <br>
+                            <p>Op de grafiek zijn, met logaritmische schalen, uitgezet:</p>
+                            <p>
+                                <ul>
+                                    <li>horizontaal : volgens twee verschillende schalen, de nominale dracht in zeemijlen (cfr. kolom 6) en eronder de lichtsterkte in candela’s (cfr. kolom 4). De lichtsterkten in candela’s zijn uitgedrukt in machten van 10.
+                                        De tussenwaarden 2 en 5 zijn vermenigvuldigingsfactoren. Tussenliggende waarden moeten op het oog worden geïnterpoleerd.</li>
+                                    <li>verticaal : de optische drachten in zeemijlen.</li>
+                                </ul>
+                            </p>
+                            <p>De waarden, in zeemijlen en kilometers, langs de krommen in de grafiek duiden het geschatte meteorologische zicht aan op het tijdstip van de waarneming. Vertrekkend van de horizontale as (lichtsterkte of nominale dracht) zoekt
+                                men evenwijdig met de ordinaat het snijpunt met de kromme meteorologisch zicht. Van hieruit vervolgt men horizontaal en men leest de optische dracht af op de verticale as.</p>
+                            <p><b>Voorbeeld</b><br> Gekend: de lichtsterkte = 149 cd of de nominale dracht = 6 M Gevraagd: de optische dracht bij een meteorologische zicht van 5,4 M. Het snijpunt van de abscis 149 candela’s (of 6 M nom. dracht) met de 5,4
+                                M kromme levert als ordinaat de gezochte afstand (4,4 M) waarop bij het heersende zicht van 5.4 M, het licht juist zichtbaar zal worden.
+                                <br>
+                                <br> Zo kan, omgekeerd, uit het diagram de meteorologische zichtbaarheid worden afgeleid, wanneer de sterkte van het licht en zijn afstand tot de waarnemer (uit het bestek) gekend zijn, op het ogenblik dat het juiste licht
+                                in zicht komt.
+                                <br>
+                                <br> Ten slotte dient te worden opgemerkt dat het gebruik van de grafiek volgende beperkingen inhoudt:
+                                <ul>
+                                    <li>De verkregen zichtbaarheden zijn benaderend;</li>
+                                    <li>De doorlating van de atmosfeer tussen waarnemer en licht verloopt niet uniform, dit vnl. door wijzigende achtergrondverlichting.</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--end Introduction-->
+
+    <!--start lichtenlijst-->
+
+    <div id="Lichtenlijst" class="div--table new-page container-fluid" style="scroll-margin-top:200px">
+        <div class="div--lichtenlijst-titles">
+            <div class="d-inline-flex">
+                <h3 class="text-left mt-4">X. GEGEVENS VAN DE LICHTEN</h3>
+            </div>
+            <div class="div--llinfodate" role="alert">
+                <p class="ml-2">(Gegevens bijgewerkt tot: - )</p>
+            </div>
+
+        </div>
+        <!--                        Table                                   -->
+        <table id="llTable" class="lltable table table-borderless table-hover">
+
+            <thead id="table--head-ll" class="table--head">
+                <!--                        Table Header 1                            -->
+                <tr class="th--tr1 h-30 table-bordered">
+                    <th id="th1--1" class="th1 w-5 text-center">VOLGNR.</th>
+                    <th id="th2--1" class="th1 w-10 text-center">PLAATS-NAAM</th>
+                    <th id="th3--1" class="th1 w-10 text-center">POSITIE GEO.</th>
+                    <th id="th4--1" class="th1 w-5 text-center">LICHT-<br> EN MISTSEIN</th>
+                    <th id="th5--1" class="th1 w-5 text-center">HOOGTE</th>
+                    <th id="th6--1" class="th1 w-5 text-center">DRACHT</th>
+                    <th id="th7--1" class="th1 w-30 text-center">BESCHRIJVING</th>
+                    <th id="th8--1" class="th1 w-30 text-center">VERDERE GEGEVENS</th>
+                </tr>
+                <!--                        Table Header 2                           -->
+                <tr class="th--tr2 table-bordered">
+                    <th id="th1--2" class="th2 text-center">(1)</th>
+                    <th id="th2--2" class="th2 text-center">(2)</th>
+                    <th id="th3--2" class="th2 text-center">(3)</th>
+                    <th id="th4--2" class="th2 text-center">(4)</th>
+                    <th id="th5--2" class="th2 text-center">(5)</th>
+                    <th id="th6--2" class="th2 text-center">(6)</th>
+                    <th id="th7--2" class="th2 text-center">(7)</th>
+                    <th id="th8--2" class="th2 text-center">(8)</th>
+                </tr>
+            </thead>
+        </table>
+        <div class="div--corresp-nrs">
+            <div class="div--natnum-intnum new-page-no-card">
+                <div class="w-100">
+                    <h4 class="w-100">Corresponderende Belgische en internationale nummers</h4>
+                </div>
+                <br>
+                <div class="div--natnum-intnum-content col5 w-100 h-100">
+
+                </div>
+            </div>
+            <div class="div--intnum-natnum new-page-no-card ">
+                <div>
+                    <h4>Corresponderende internationale en Belgische nummers</h4>
+                </div>
+                <br>
+                <div class="div--intnum-natnum-content col5 w-100 h-100">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div--notes container-fluid h-100 new-page-no-card">
+        <div>
+            <div class="d-inline-flex">
+                <h3 class="text-left mt-4">XI. NOTITIES</h3>
+            </div>
+            <hr>
+        </div>
+        <br>
+        <div>
+            <p></p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+            <p>.............................................................................................................................................................................................................................................................................................</p>
+
+        </div>
+    </div>
+    <!--end lichtenlijst-->
+    </div>
+</body>
+
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="./js/jquery-3.6.0.min.js"></script>
+<script src="https://kit.fontawesome.com/0e8068ec8e.js"></script>
+<script src="./js/parameter.js"></script>
+<script src="js/filereader.js"></script>
+<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+<script src="./js/actions.js"></script>
+<script src="./js/lichtenlijst_scripts.js"></script>
+
+</html>
