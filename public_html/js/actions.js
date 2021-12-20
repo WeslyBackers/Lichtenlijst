@@ -52,7 +52,8 @@ $(".btn-map").click(function(lights) {
     $("#mapid").toggle();
     // console.log(lights);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
-
+    var top = $(".div--map").top() + $(".div--map").height();
+    $(".lltable").offset({top: top});
 });
 
 //show & hide section for print
