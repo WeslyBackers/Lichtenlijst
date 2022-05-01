@@ -4,11 +4,11 @@ import sys
 import shapefile
 
 #get examples of shapefiles from https://www.diva-gis.org/datadown
-sf = shapefile.Reader("F:\Werk\Lichtenlijst\Data\BEL_water_lines_dcw.shp")
+sf = shapefile.Reader("Data/BEL_water_areas_dcw.shp","Data/BEL_water_areas_dcw.shx","Data/BEL_water_areas_dcw.dbf")
 
 #get data from the shapefile in records, fields and objecttypes
-records=sf.records()
-fields=sf.fields
+records = sf.records()
+fields = sf.fields
 types = sf.shapeType
 
 #print results
